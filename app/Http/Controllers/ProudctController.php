@@ -26,6 +26,7 @@ class ProudctController extends Controller
      */
     public function create(Request $request)
     {
+        // dd('here');
         $request->validate([
             'title' => 'required|max:255',
             'description' => 'required|max:255',
@@ -36,6 +37,7 @@ class ProudctController extends Controller
             'title' => $request->title,
             'description' => $request->description,
             'price' => $request->price,
+            'user_id' => $request->user()->id,
         ]);
 
         return response([
@@ -51,7 +53,22 @@ class ProudctController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required|max:255',
+            'price' => 'required'
+        ]);
+
+        Product::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'price' => $request->price,
+            'user_id' => $request->user()->id,
+        ]);
+
+        return response([
+            'message' => 'product created successfully'
+        ], 201);
     }
 
     /**
@@ -87,6 +104,7 @@ class ProudctController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         $product = Product::findOrFail($id);
         $product->update([
             'title' => $request->title,
