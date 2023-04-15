@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Product;
 
 class ProudctController extends Controller
 {
@@ -11,9 +12,11 @@ class ProudctController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request  $request)
     {
-        //
+        $user_id = $request->user()->id;
+        $products=Product::where('user_id', $user_id)->get();
+        return response($products);
     }
 
     /**
@@ -21,9 +24,23 @@ class ProudctController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required|max:255',
+            'price' => 'required'
+        ]);
+
+        Product::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'price' => $request->price,
+        ]);
+
+        return response([
+            'message' => 'product created successfully'
+        ], 201);
     }
 
     /**
@@ -45,7 +62,9 @@ class ProudctController extends Controller
      */
     public function show($id)
     {
-        //
+        $product = Product::findOrFail($id);
+
+        return response($product, 201);
     }
 
     /**
@@ -68,7 +87,16 @@ class ProudctController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $product->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'price' => $request->price,
+        ]);
+
+        return response([
+            'message' => 'Product updated successfully'
+        ], 201);
     }
 
     /**
@@ -79,6 +107,10 @@ class ProudctController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $product = Product::where('id', $id)->delete();
+
+        return response([
+            'message' => 'Product deleted successfully'
+        ], 201);
     }
 }
